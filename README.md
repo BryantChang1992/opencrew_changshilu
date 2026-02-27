@@ -54,10 +54,10 @@ OpenCrew 分为三层，每层职责清晰：
 | 层级 | 角色 | 职责 |
 |------|------|------|
 | **意图对齐** | 你 + CoS（幕僚长） | 定方向、验收结果。CoS 帮你对齐深层目标，你不在时代为推进。**CoS 不是网关，你想跟谁聊直接进哪个频道。** |
-| **执行** | CTO / Builder / CIO / Research | CTO 拆解架构，Builder 实现，CIO 是可替换的领域专家（投资/法律/营销），Research 按需调研。 |
+| **执行** | CTO / Builder / Infra / Perf / Research | CTO 拆解架构，Builder 实现，Infra 是分布式存储专家，Perf 是性能评估专家，Research 按需调研。 |
 | **系统维护** | KO + Ops | KO 从产出中提炼可复用知识；Ops 审计变更、防止漂移。不做业务，只维护系统健康。 |
 
-> 最小可用：CoS + CTO + Builder（3 个 Agent 就能跑起来）。KO/Ops/CIO/Research 按需添加。
+> 最小可用：CoS + CTO + Builder（3 个 Agent 就能跑起来）。KO/Ops/Infra/Perf/Research 按需添加。
 
 ### 实际运行效果
 
@@ -88,7 +88,10 @@ OpenCrew 分为三层，每层职责清晰：
 | `#cto` | CTO 技术合伙人 | 技术方向和任务拆解 |
 | `#build` | Builder 执行者 | 具体实现和交付 |
 
-> 按需扩展：`#invest`（CIO）`#know`（KO）`#ops`（Ops）`#research`（Research）
+| `#infra` | Infra 存储专家 | 流存储、分布式文件系统、共识协议 |
+| `#perf` | Perf 性能专家 | 性能诊断、压测、容量规划 |
+
+> 按需扩展：`#know`（KO）`#ops`（Ops）`#research`（Research）
 
 ### Step 2：让你的 OpenClaw 完成部署
 
@@ -203,7 +206,7 @@ Layer 2: KO 提炼的抽象知识（原则 / 模式 / 踩坑记录）
 ### 🔄 探索中
 
 - 更好的知识系统（跨 session 语义检索）
-- 更轻量的架构（v2-lite：7 Agent → 5，9 个 shared 文件 → 3）
+- 更轻量的架构（v2-lite：8 Agent → 5，9 个 shared 文件 → 3）
 - Slack root message 独立 session 的更稳定方案
 
 ---
