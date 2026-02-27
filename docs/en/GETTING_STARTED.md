@@ -129,7 +129,7 @@ Replace `for a in cos cto builder` with `for a in cos cto builder cio ko ops res
 # Special subdirectories for KO and CIO
 mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
 mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
-mkdir -p ~/.openclaw/workspace-cio/{decisions,principles,signals,watchlist}
+mkdir -p ~/.openclaw/workspace-infra/{decisions,principles,signals,watchlist}
 ```
 
 ---

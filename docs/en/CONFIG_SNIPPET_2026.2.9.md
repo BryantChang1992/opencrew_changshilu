@@ -70,7 +70,7 @@ Append these agents to your existing `agents.list` (do not remove your original 
       {
         "id": "cio",
         "name": "CIO / Domain Specialist (Optional)",
-        "workspace": "~/.openclaw/workspace-cio",
+        "workspace": "~/.openclaw/workspace-infra",
         "subagents": { "allowAgents": ["cio", "research", "ko"] }
       },
       {

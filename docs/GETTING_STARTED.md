@@ -129,7 +129,7 @@ ls ~/.openclaw/shared/SYSTEM_RULES.md && echo "✅ shared 协议就位"
 # KO 和 CIO 的特殊子目录
 mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
 mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
-mkdir -p ~/.openclaw/workspace-cio/{decisions,principles,signals,watchlist}
+mkdir -p ~/.openclaw/workspace-infra/{decisions,principles,signals,watchlist}
 ```
 
 ---
