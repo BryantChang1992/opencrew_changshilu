@@ -54,7 +54,7 @@ OpenCrew 分为三层，每层职责清晰：
 | 层级 | 角色 | 职责 |
 |------|------|------|
 | **意图对齐** | 你 + CoS（幕僚长） | 定方向、验收结果。CoS 帮你对齐深层目标，你不在时代为推进。**CoS 不是网关，你想跟谁聊直接进哪个频道。** |
-| **执行** | CTO / Builder / Infra / Perf / Research | CTO 拆解架构，Builder 实现，Infra 是分布式存储专家，Perf 是性能评估专家，Research 按需调研。 |
+| **执行** | CTO / Builder / Infra / Perf / Research | CTO 拆解架构，Builder 实现，Infra 是分布式系统与大数据专家（尤其精通分布式存储、分布式文件系统、共识协议），Perf 是性能评估专家，Research 按需调研。 |
 | **系统维护** | KO + Ops | KO 从产出中提炼可复用知识；Ops 审计变更、防止漂移。不做业务，只维护系统健康。 |
 
 > 最小可用：CoS + CTO + Builder（3 个 Agent 就能跑起来）。KO/Ops/Infra/Perf/Research 按需添加。
@@ -88,7 +88,7 @@ OpenCrew 分为三层，每层职责清晰：
 | `#cto` | CTO 技术合伙人 | 技术方向和任务拆解 |
 | `#build` | Builder 执行者 | 具体实现和交付 |
 
-| `#infra` | Infra 存储专家 | 流存储、分布式文件系统、共识协议 |
+| `#infra` | Infra 分布式系统专家 | 分布式系统与大数据架构，精通分布式存储、文件系统、共识协议 |
 | `#perf` | Perf 性能专家 | 性能诊断、压测、容量规划 |
 
 > 按需扩展：`#know`（KO）`#ops`（Ops）`#research`（Research）
