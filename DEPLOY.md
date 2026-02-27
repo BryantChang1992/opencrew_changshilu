@@ -21,14 +21,15 @@
 
 ## 1. 创建 Slack 频道（岗位）
 
-建议先创建这 7 个频道（名字可自定义）：
-- #hq（CoS）
-- #cto（CTO）
-- #build（Builder）
-- #invest（CIO，可选，可替换为你的领域）
-- #know（KO，建议开启 requireMention 降噪；开源版默认关闭，先保证跑通）
-- #ops（Ops，建议开启 requireMention 降噪；开源版默认关闭，先保证跑通）
-- #research（Research，可选，通常只 spawn）
+建议先创建这 8 个频道（名字可自定义）：
+- #hq（CoS 幕僚长）
+- #cto（CTO 技术负责人）
+- #build（Builder 代码实现者）
+- #infra（Infra 分布式存储专家，替换原 CIO）
+- #perf（Perf 性能评估专家）
+- #know（KO 知识官）
+- #ops（Ops 运维治理）
+- #research（Research 调研员，可选，通常只 spawn）
 
 然后把 bot 邀请进这些频道：`/invite @<bot>`。
 
@@ -118,7 +119,7 @@ Slack tokens（请写入配置，不要回显）：
 mkdir -p ~/.openclaw/shared
 cp shared/*.md ~/.openclaw/shared/
 
-for a in cos cto builder cio ko ops research; do
+for a in cos cto builder infra perf ko ops research; do
   mkdir -p ~/.openclaw/workspace-$a
   # 推荐递归复制（包含 ko/knowledge、cto/scars 等子目录模板）
   rsync -a --ignore-existing "workspaces/$a/" "$HOME/.openclaw/workspace-$a/"
@@ -127,16 +128,18 @@ done
 # （推荐）把 shared/ 以软链接方式挂到每个 workspace 下，让 shared 规则更容易被 Agent“看见”。
 # - 不会复制多份文件，避免 shared 漂移
 # - 如果你的 workspace 下已经有 shared/ 目录，则跳过（你可以手动处理）
-for a in cos cto builder cio ko ops research; do
+for a in cos cto builder infra perf ko ops research; do
   if [ ! -e "$HOME/.openclaw/workspace-$a/shared" ]; then
     ln -s "$HOME/.openclaw/shared" "$HOME/.openclaw/workspace-$a/shared"
   fi
 done
 
 # 推荐：创建 OpenCrew 会用到的工作区子目录（避免后续写文件失败）
-mkdir -p ~/.openclaw/workspace-{cos,cto,builder,cio,ko,ops,research}/memory
+mkdir -p ~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}/memory
 mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
 mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
+mkdir -p ~/.openclaw/workspace-infra/{principles,decisions,benchmarks,watchlist,signals}
+mkdir -p ~/.openclaw/workspace-perf/{principles,decisions,benchmarks,reports}
 ```
 
 > 说明：这里使用 `rsync --ignore-existing` 是为了尽量避免覆盖你已经在用的 workspace 文件。
@@ -169,10 +172,13 @@ openclaw status
 
 ---
 
-## 5. 可选项：如果你不需要 CIO / Research
+## 5. 可选项：如果你不需要 Infra / Perf / Research
 
-- 不需要 CIO：可以不创建 #invest，也不添加 CIO 的 binding/allowlist/agent 条目。
-- Research 通常 spawn-only：可以不绑定 #research，或者只在需要时添加。
+- **Infra（分布式存储专家）**：可选，适合需要存储/基础设施架构评审的场景。如果不需要，可以不创建 #infra，也不添加对应配置。
+- **Perf（性能评估专家）**：可选，适合需要性能分析和优化指导的场景。如果不需要，可以不创建 #perf，也不添加对应配置。
+- **Research** 通常 spawn-only：可以不绑定 #research，或者只在需要时添加。
+
+> 注意：本仓库的 Infra 已预配置为分布式存储与基础设施专家（流存储、分布式文件系统、共识协议），CIO 已不再是投资专家。如果你需要投资专家，请参考原版 CIO 配置自行定制。
 
 ---
 

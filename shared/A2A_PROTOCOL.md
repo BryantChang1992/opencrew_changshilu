@@ -17,9 +17,10 @@
 ## 1) 权限矩阵（必须遵守）
 
 - CoS → 只能给 CTO 派单/对齐方向（默认不直达 Builder）
-- CTO → 可以派单给 Builder / Research / KO / Ops
-- Builder → 只接单执行；需要澄清时回到 CTO thread 提问
-- CIO → 尽量独立；仅必要时与 CoS/KO 同步
+- CTO → 可以派单给 Builder / Research / KO / Ops / Infra / Perf
+- **Infra** → 独立运作（分布式存储专家）；可以与 CTO/Builder 同步；可 spawn research/ko
+- **Perf** → 独立运作（性能评估专家）；可以与 CTO/Builder 协作；可 spawn research/ko
+- Builder → 只接单执行；需要澄清时回到 CTO/Infra/Perf thread 提问
 - KO/Ops → 作为审计/沉淀，通常不主动派单
 
 （注：技术上 Slack bot 可以给任意频道发消息，但这是组织纪律，不遵守视为 bug。）

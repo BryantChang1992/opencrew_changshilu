@@ -27,7 +27,8 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
   - `<SLACK_CHANNEL_ID_HQ>`（#hq）
   - `<SLACK_CHANNEL_ID_CTO>`（#cto）
   - `<SLACK_CHANNEL_ID_BUILD>`（#build）
-  - `<SLACK_CHANNEL_ID_INVEST>`（#invest，可选）
+  - `<SLACK_CHANNEL_ID_INFRA>`（#infra，分布式存储专家）
+  - `<SLACK_CHANNEL_ID_PERF>`（#perf，性能评估专家）
   - `<SLACK_CHANNEL_ID_KNOW>`（#know）
   - `<SLACK_CHANNEL_ID_OPS>`（#ops）
   - `<SLACK_CHANNEL_ID_RESEARCH>`（#research，可选）
@@ -70,10 +71,17 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
         "subagents": { "allowAgents": ["builder"] }
       },
       {
-        "id": "cio",
-        "name": "CIO / Domain Specialist (Optional)",
-        "workspace": "~/.openclaw/workspace-cio",
-        "subagents": { "allowAgents": ["cio", "research", "ko"] }
+        "id": "infra",
+        "name": "Infrastructure Architect / Storage Expert",
+        "workspace": "~/.openclaw/workspace-infra",
+        "subagents": { "allowAgents": ["infra", "research", "ko"] }
+      },
+      {
+        "id": "perf",
+        "name": "Performance Engineer",
+        "workspace": "~/.openclaw/workspace-perf",
+        "subagents": { "allowAgents": ["perf", "research", "ko"] },
+        "heartbeat": { "every": "24h", "target": "slack", "to": "channel:<SLACK_CHANNEL_ID_PERF>" }
       },
       {
         "id": "ko",
@@ -121,7 +129,8 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
     { "agentId": "cos", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_HQ>" } } },
     { "agentId": "cto", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_CTO>" } } },
     { "agentId": "builder", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_BUILD>" } } },
-    { "agentId": "cio", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_INVEST>" } } },
+    { "agentId": "infra", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_INFRA>" } } },
+    { "agentId": "perf", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_PERF>" } } },
     { "agentId": "ko", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_KNOW>" } } },
     { "agentId": "ops", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_OPS>" } } },
     { "agentId": "research", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_RESEARCH>" } } }
@@ -141,7 +150,8 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
         "<SLACK_CHANNEL_ID_HQ>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_CTO>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_BUILD>": { "allow": true, "requireMention": false },
-        "<SLACK_CHANNEL_ID_INVEST>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_INFRA>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_PERF>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_KNOW>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_OPS>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_RESEARCH>": { "allow": true, "requireMention": false }
@@ -201,9 +211,11 @@ OpenCrew 的工作流会用到一些子目录（用于 daily memory、KO inbox/k
 建议先创建（不会影响你现有配置）：
 
 ```bash
-mkdir -p ~/.openclaw/workspace-{cos,cto,builder,cio,ko,ops,research}/memory
+mkdir -p ~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}/memory
 mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
 mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
+mkdir -p ~/.openclaw/workspace-infra/{principles,decisions,benchmarks,watchlist,signals}
+mkdir -p ~/.openclaw/workspace-perf/{principles,decisions,benchmarks,reports}
 ```
 
 ---
@@ -236,5 +248,5 @@ openclaw gateway restart
   - `bindings` 新增条目
   - `channels.slack.channels` 的 allowlist 条目
   - `tools.agentToAgent` / `session.agentToAgent` 的增量
-- （可选）删除新建目录：`~/.openclaw/workspace-{cos,cto,builder,cio,ko,ops,research}`
+- （可选）删除新建目录：`~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}`
 
