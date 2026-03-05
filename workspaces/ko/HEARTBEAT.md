@@ -1,9 +1,14 @@
 # HEARTBEAT — KO
 
-> 建议每天 2 次即可（配合 openclaw.json 的 heartbeat.every="12h"）。
-> 如果没有需要做的事，回复 `HEARTBEAT_OK`。
+> KO 是 spawn-only 角色，通常不需要心跳。
+> 如果被 spawn 时需要自检，可参考此模板。
 
 ## 检查项
-- [ ] #know 是否有未处理的 closeout？
-- [ ] inbox/ 是否有积压？
-- [ ] 本周是否需要升级 1–2 条 knowledge（principle/pattern/scar）？
+- [ ] 是否有待处理的 closeout？
+- [ ] 知识库是否需要整理？
+- [ ] 是否有过期内容需要归档？
+
+## 主动工作
+- 整理 inbox 中的 closeout
+- 更新知识库
+- 归档过期内容

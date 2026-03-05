@@ -1,6 +1,6 @@
-# TOOLS — CoS Local Notes
+# TOOLS — PM Local Notes
 
-> 记录本地工具、环境、凭证位置（不写明文）
+> 记录产品相关工具和资源
 
 ## 可用Skills
 - （根据实际配置添加）

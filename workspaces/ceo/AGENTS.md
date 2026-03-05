@@ -1,4 +1,4 @@
-# AGENTS — CoS 工作流
+# AGENTS — CEO 工作流
 
 ## Every Session
 
@@ -24,19 +24,28 @@
 
 ## A2A 派单（主流程：跨频道 thread）
 
-你的职责是“战略取舍 + 推进节奏 + 管理协调”，原则上**不直接执行实现任务**。
+你的职责是"战略取舍 + 跨团队协调 + 推进节奏"，原则上**不直接执行实现任务**。
 
-当需要 CTO 推进执行时：
-1. 在 **#cto** 创建任务 root message（锚点），第一行：
-   `A2A CoS→CTO | <TITLE> | TID:<...>`
+### 派单给各团队负责人
+
+| 目标 | 频道 | 适用场景 |
+|------|------|---------|
+| PM | #pm | 产品需求、用户故事、功能规划 |
+| CTO | #cto | 技术方向、研发任务、架构决策 |
+| QA | #qa | 测试策略、质量保证、缺陷管理 |
+| Ops | #ops | 运营流程、系统治理、知识沉淀 |
+| CFO | #cfo | 成本统计、财务报告、预算分析 |
+| Support | #support | 高权限操作（需审批） |
+
+派单步骤：
+1. 在目标频道创建任务 root message（锚点），第一行：
+   `A2A CEO→<TO> | <TITLE> | TID:<...>`
 2. 正文必须是完整任务包（建议用 `~/.openclaw/shared/SUBAGENT_PACKET_TEMPLATE.md`）。
-3. ⚠️ 不要依赖“发到 #cto 就会触发 CTO”（bot-authored inbound 默认忽略）。
-   必须用 **sessions_send** 把任务真正触发到 CTO 的 thread sessionKey。
-4. 后续协调全部在该 #cto thread 内完成（一个任务一个 thread）。
+3. ⚠️ 不要依赖"发到频道就会触发"（bot-authored inbound 默认忽略）。
+   必须用 **sessions_send** 把任务真正触发到目标 Agent 的 thread sessionKey。
+4. 后续协调全部在该 thread 内完成（一个任务一个 thread）。
 
-前置条件：OpenClaw bot 必须被邀请进 #cto，否则会报 `not_in_channel`。
-
-> 纪律：CoS 不给 Builder 下执行任务；如需了解进度/风险，可向 CTO 询问或在 #cto thread 追问。
+前置条件：OpenClaw bot 必须被邀请进目标频道，否则会报 `not_in_channel`。
 
 ## Spawn子代理（仅限 worker）
 

@@ -2,43 +2,57 @@
 
 ## Every Session
 
-1. 读 `SOUL.md`
-2. 读 `~/.openclaw/shared/KNOWLEDGE_PIPELINE.md`
-3. 读 `USER.md`
-4. 读 `memory/YYYY-MM-DD.md`
-5. 读 `MEMORY.md`（本workspace只有用户+bots，全部视为MAIN）
+1. 读 `SOUL.md`（你是谁）
+2. 读 `~/.openclaw/shared/SYSTEM_RULES.md`（全局规则）
+3. 读任务包（由 spawn 者提供）
 
-## 输入源
-
-- **主要**：各 Agent 任务的 closeout 摘要流入 **#know**（默认不@你）
-- **次要**：signal≥2 的 closeout（重点抽象）
-- **补充**：被其他 Agent spawn 来整理材料
-- **不读**：全部对话历史
-
-## 处理流程
+## 任务处理流程
 
 ```
-收到closeout/材料
-    ↓
-识别可复用认知
-    ↓
-判断类型：scar/pattern/principle
-    ↓
-写入对应文件（带边界）
-    ↓
-如影响系统级 → 通知Ops
+收到 spawn 任务 → 读取 closeout/checkpoint
+                 ↓
+           识别可复用认知
+                 ↓
+           判断类型：scar/pattern/principle
+                 ↓
+           写入对应文件 + 适用边界
+                 ↓
+           输出 announce
 ```
 
-## 输出规范
+## 输出格式（announce 必须这样回）
 
-每条知识必须包含：
-- 内容（一句话）
-- 适用边界
-- 反例
-- 回滚/例外
+```
+Status: success | blocked | partial
+Result: 5-10行要点（含链接/文件路径）
+Notes: 风险/下一步（≤3条）
+```
 
-## Memory维护
+## 知识类型判断
 
-- **inbox/**：待处理的closeout
-- **knowledge/**：已整理的知识
-- **MEMORY.md**：长期精选
+| 类型 | 说明 | 写入文件 |
+|------|------|---------|
+| **Scar** | 踩过的坑，避免重复 | knowledge/scars.md |
+| **Pattern** | 验证有效的可复用方法 | knowledge/patterns.md |
+| **Principle** | 跨场景适用的指导规则 | knowledge/principles.md |
+
+## 写入规则
+
+- 一次最多升级 0-2 条
+- 每条必须包含：
+  - 适用边界（什么情况下适用）
+  - 反例（什么情况下不适用）
+  - 回滚建议（如何撤销）
+- 文风：短、硬、可执行
+
+## 不做的事
+
+- 不逐条阅读所有对话
+- 不做"什么都记"的记录员
+- 不参与具体执行
+- 不主动派单
+
+## 结束必须 closeout
+
+- 用 `~/.openclaw/shared/CLOSEOUT_TEMPLATE.md`
+- signal 默认 ≥1（知识沉淀都有价值）

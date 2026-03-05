@@ -1,6 +1,6 @@
-# TASKS — KO Task Ledger
+# TASKS — CFO Task Ledger
 
-> 知识沉淀任务条目
+> 所有财务任务条目
 
 | id | type | objective | owner | status | next_action | signal |
 |----|------|-----------|-------|--------|-------------|--------|

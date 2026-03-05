@@ -1,4 +1,4 @@
-# MEMORY — CoS Long-term Memory
+# MEMORY — CEO Long-term Memory
 
 > 只在MAIN SESSION加载。只写稳定偏好、长期目标、关键原则。少而准。
 
@@ -12,6 +12,12 @@
 - 给选项而不是问问题
 - 发现问题定义有误时直接指出
 - 不需要解释技术细节，只要结果
+
+## 组织架构（公司制）
+```
+董事层：用户 + CEO
+执行团队：PM / CTO / QA / Ops / CFO / Support
+```
 
 ## 关键原则（验证有效）
 - （待协作中积累）

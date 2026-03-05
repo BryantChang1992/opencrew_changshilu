@@ -2,12 +2,12 @@
 
 > 📖 [README](../README.md) → [完整上手指南](GETTING_STARTED.md) → **配置参考**
 
-# OpenClaw 2026.2.9 — OpenCrew 最小增量配置
+# OpenClaw 2026.2.9 — OpenCrew 公司制架构配置
 
 > 适用：已经在本机安装并能运行 OpenClaw（能执行 `openclaw status`）。
 >
 > 原则：
-> - 不提供“完整 openclaw.json”（避免误覆盖 `auth/models/gateway`）
+> - 不提供"完整 openclaw.json"（避免误覆盖 `auth/models/gateway`）
 > - 只提供 **最小增量**：新增 Agents + Slack 频道绑定 + A2A 限制
 > - 可回滚：删除我们新增的片段 + 删除新建的 workspace 目录
 
@@ -24,14 +24,18 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
 ## 你需要准备的占位符
 
 - Slack Channel IDs：
-  - `<SLACK_CHANNEL_ID_HQ>`（#hq）
+  - `<SLACK_CHANNEL_ID_CEO>`（#ceo）
+  - `<SLACK_CHANNEL_ID_PM>`（#pm）
   - `<SLACK_CHANNEL_ID_CTO>`（#cto）
   - `<SLACK_CHANNEL_ID_BUILD>`（#build）
-  - `<SLACK_CHANNEL_ID_INFRA>`（#infra，分布式存储专家）
-  - `<SLACK_CHANNEL_ID_PERF>`（#perf，性能评估专家）
-  - `<SLACK_CHANNEL_ID_KNOW>`（#know）
+  - `<SLACK_CHANNEL_ID_INFRA>`（#infra）
+  - `<SLACK_CHANNEL_ID_PERF>`（#perf）
+  - `<SLACK_CHANNEL_ID_QA>`（#qa）
   - `<SLACK_CHANNEL_ID_OPS>`（#ops）
-  - `<SLACK_CHANNEL_ID_RESEARCH>`（#research，可选）
+  - `<SLACK_CHANNEL_ID_CFO>`（#cfo）
+  - `<SLACK_CHANNEL_ID_SUPPORT>`（#support）
+  - `<SLACK_CHANNEL_ID_RESEARCH>`（#research，可选，spawn-only）
+  - `<SLACK_CHANNEL_ID_KO>`（#ko，可选，spawn-only）
 
 获取方法见：[`docs/SLACK_SETUP.md`](./SLACK_SETUP.md)
 
@@ -41,7 +45,7 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
 
 > 说明：以下片段假设你已经有自己的 `openclaw.json`。你只需要把这些**新增项**合并进去即可。
 >
-> 如果你已经有同名 agent id（例如已存在 `cos`/`cto`），请改成不冲突的 id（例如 `crew-cos`），并同步修改 bindings。
+> 如果你已经有同名 agent id，请改成不冲突的 id，并同步修改 bindings。
 
 ### A) 新增 Agents（`agents.list`）
 
@@ -52,17 +56,23 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
   "agents": {
     "list": [
       {
-        "id": "cos",
-        "name": "Chief of Staff",
-        "workspace": "~/.openclaw/workspace-cos",
-        "subagents": { "allowAgents": ["cos", "cto", "research", "ko", "builder"] },
-        "heartbeat": { "every": "12h", "target": "slack", "to": "channel:<SLACK_CHANNEL_ID_HQ>" }
+        "id": "ceo",
+        "name": "Chief Executive Officer",
+        "workspace": "~/.openclaw/workspace-ceo",
+        "subagents": { "allowAgents": ["ceo", "research", "ko"] },
+        "heartbeat": { "every": "12h", "target": "slack", "to": "channel:<SLACK_CHANNEL_ID_CEO>" }
+      },
+      {
+        "id": "pm",
+        "name": "Product Manager",
+        "workspace": "~/.openclaw/workspace-pm",
+        "subagents": { "allowAgents": ["pm", "research"] }
       },
       {
         "id": "cto",
-        "name": "CTO / Tech Partner",
+        "name": "CTO / Tech Lead",
         "workspace": "~/.openclaw/workspace-cto",
-        "subagents": { "allowAgents": ["cto", "builder", "research", "ko"] }
+        "subagents": { "allowAgents": ["cto", "builder", "infra", "perf", "research", "ko"] }
       },
       {
         "id": "builder",
@@ -72,7 +82,7 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
       },
       {
         "id": "infra",
-        "name": "Infrastructure Architect / Storage Expert",
+        "name": "Infrastructure Architect",
         "workspace": "~/.openclaw/workspace-infra",
         "subagents": { "allowAgents": ["infra", "research", "ko"] }
       },
@@ -84,11 +94,10 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
         "heartbeat": { "every": "24h", "target": "slack", "to": "channel:<SLACK_CHANNEL_ID_PERF>" }
       },
       {
-        "id": "ko",
-        "name": "Knowledge Officer",
-        "workspace": "~/.openclaw/workspace-ko",
-        "subagents": { "allowAgents": ["ko"] },
-        "heartbeat": { "every": "12h", "target": "slack", "to": "channel:<SLACK_CHANNEL_ID_KNOW>" }
+        "id": "qa",
+        "name": "Quality Assurance",
+        "workspace": "~/.openclaw/workspace-qa",
+        "subagents": { "allowAgents": ["qa"] }
       },
       {
         "id": "ops",
@@ -97,9 +106,27 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
         "subagents": { "allowAgents": ["ops", "ko"] }
       },
       {
+        "id": "cfo",
+        "name": "Chief Financial Officer",
+        "workspace": "~/.openclaw/workspace-cfo",
+        "subagents": { "allowAgents": ["cfo", "ko"] }
+      },
+      {
+        "id": "support",
+        "name": "OpenClaw Support",
+        "workspace": "~/.openclaw/workspace-support",
+        "subagents": { "allowAgents": ["support"] }
+      },
+      {
         "id": "research",
         "name": "Research Worker (Spawn-only)",
         "workspace": "~/.openclaw/workspace-research",
+        "subagents": { "allowAgents": [] }
+      },
+      {
+        "id": "ko",
+        "name": "Knowledge Officer (Spawn-only)",
+        "workspace": "~/.openclaw/workspace-ko",
         "subagents": { "allowAgents": [] }
       }
     ]
@@ -112,7 +139,7 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
 ```json
 {
   "tools": {
-    "agentToAgent": { "enabled": true, "allow": ["cos", "cto", "ops"] },
+    "agentToAgent": { "enabled": true, "allow": ["ceo", "pm", "cto", "ops", "cfo"] },
     "subagents": { "tools": { "deny": ["group:sessions"] } }
   },
   "session": {
@@ -123,17 +150,21 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
 
 ### C) Slack 频道绑定（`bindings`）
 
+> 注：Research 和 KO 是 spawn-only 角色，可以不绑定频道。
+
 ```json
 {
   "bindings": [
-    { "agentId": "cos", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_HQ>" } } },
+    { "agentId": "ceo", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_CEO>" } } },
+    { "agentId": "pm", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_PM>" } } },
     { "agentId": "cto", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_CTO>" } } },
     { "agentId": "builder", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_BUILD>" } } },
     { "agentId": "infra", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_INFRA>" } } },
     { "agentId": "perf", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_PERF>" } } },
-    { "agentId": "ko", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_KNOW>" } } },
+    { "agentId": "qa", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_QA>" } } },
     { "agentId": "ops", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_OPS>" } } },
-    { "agentId": "research", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_RESEARCH>" } } }
+    { "agentId": "cfo", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_CFO>" } } },
+    { "agentId": "support", "match": { "channel": "slack", "peer": { "kind": "channel", "id": "<SLACK_CHANNEL_ID_SUPPORT>" } } }
   ]
 }
 ```
@@ -147,14 +178,16 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
       "replyToMode": "all",
       "groupPolicy": "allowlist",
       "channels": {
-        "<SLACK_CHANNEL_ID_HQ>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_CEO>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_PM>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_CTO>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_BUILD>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_INFRA>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_PERF>": { "allow": true, "requireMention": false },
-        "<SLACK_CHANNEL_ID_KNOW>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_QA>": { "allow": true, "requireMention": false },
         "<SLACK_CHANNEL_ID_OPS>": { "allow": true, "requireMention": false },
-        "<SLACK_CHANNEL_ID_RESEARCH>": { "allow": true, "requireMention": false }
+        "<SLACK_CHANNEL_ID_CFO>": { "allow": true, "requireMention": false },
+        "<SLACK_CHANNEL_ID_SUPPORT>": { "allow": true, "requireMention": false }
       },
       "thread": { "historyScope": "thread", "inheritParent": false }
     }
@@ -164,36 +197,35 @@ cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.bak.$(date +%Y%m%d-%H%M%S
 
 ### 可选：开启 @mention gate（降噪；建议你跑通后再开）
 
-开源版默认把 `#know` / `#ops` 设为 `requireMention: false`，优先保证“照着做就能跑起来”。
+开源版默认所有频道设为 `requireMention: false`，优先保证"照着做就能跑起来"。
 
-如果你希望它们更安静（只在你显式 @mention 时才触发），把下面两项改成 `true`：
+如果你希望某些频道更安静（只在你显式 @mention 时才触发），把对应项改成 `true`：
 
 ```json
 {
   "channels": {
     "slack": {
       "channels": {
-        "<SLACK_CHANNEL_ID_KNOW>": { "allow": true, "requireMention": true },
-        "<SLACK_CHANNEL_ID_OPS>": { "allow": true, "requireMention": true }
+        "<SLACK_CHANNEL_ID_SUPPORT>": { "allow": true, "requireMention": true }
       }
     }
   }
 }
 ```
 
-### E) Heartbeat（推荐默认开启：本 snippet 已为 CoS/KO 开启）
+### E) Heartbeat（推荐默认开启：本 snippet 已为 CEO/Perf 开启）
 
-很多人以为“有了 `HEARTBEAT.md` 文件就会自动跑心跳”，但 **心跳是否运行由 `openclaw.json` 决定**。
+很多人以为"有了 `HEARTBEAT.md` 文件就会自动跑心跳"，但 **心跳是否运行由 `openclaw.json` 决定**。
 
-在上面的 `agents.list` 示例里，我们已经为 `cos` / `ko` 加了：
-- `heartbeat.every = "12h"`（≈每天 2 次）
+在上面的 `agents.list` 示例里，我们已经为 `ceo` / `perf` 加了：
+- `heartbeat.every = "12h"` 或 `"24h"`
 - `heartbeat.target = "slack"` + `to = "channel:<...>"`
 
 > 重要规则（来自 OpenClaw 文档）：
 > 如果 `agents.list[]` 里**任何一个** agent 配了 `heartbeat` 块，那么**只有**配置了 `heartbeat` 的 agents 才会运行心跳。
-> 因此：如果你原本依赖 `agents.defaults.heartbeat` 跑“全局心跳”，引入 per-agent heartbeat 后行为会变化。
+> 因此：如果你原本依赖 `agents.defaults.heartbeat` 跑"全局心跳"，引入 per-agent heartbeat 后行为会变化。
 
-如果你不想让 CoS/KO 运行心跳：删除这两个 agent 条目中的 `heartbeat` 块即可。
+如果你不想让 CEO/Perf 运行心跳：删除对应 agent 条目中的 `heartbeat` 块即可。
 验证心跳是否在跑：
 
 ```bash
@@ -203,19 +235,49 @@ openclaw system heartbeat enable
 openclaw system heartbeat disable
 ```
 
-> 如果你想“固定每天 09:00/21:00 准时触发”，更适合用 cron；heartbeat 更适合“间隔型、自检型”。
+> 如果你想"固定每天 09:00/21:00 准时触发"，更适合用 cron；heartbeat 更适合"间隔型、自检型"。
 
 ### F) 工作区目录准备（强烈建议）
 
-OpenCrew 的工作流会用到一些子目录（用于 daily memory、KO inbox/knowledge、CTO scars/patterns）。
+OpenCrew 的工作流会用到一些子目录（用于 daily memory、KO inbox/knowledge、CTO scars/patterns 等）。
 建议先创建（不会影响你现有配置）：
 
 ```bash
-mkdir -p ~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}/memory
-mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
-mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
-mkdir -p ~/.openclaw/workspace-infra/{principles,decisions,benchmarks,watchlist,signals}
-mkdir -p ~/.openclaw/workspace-perf/{principles,decisions,benchmarks,reports}
+# CEO
+mkdir -p ~/.openclaw/workspace-ceo/{memory,board}
+
+# PM
+mkdir -p ~/.openclaw/workspace-pm/memory
+
+# CTO
+mkdir -p ~/.openclaw/workspace-cto/{memory,scars,patterns}
+
+# Builder
+mkdir -p ~/.openclaw/workspace-builder/memory
+
+# Infra
+mkdir -p ~/.openclaw/workspace-infra/{memory,principles,decisions,benchmarks,watchlist,signals}
+
+# Perf
+mkdir -p ~/.openclaw/workspace-perf/{memory,principles,decisions,benchmarks,reports}
+
+# QA
+mkdir -p ~/.openclaw/workspace-qa/{memory,test-cases,reports}
+
+# Ops
+mkdir -p ~/.openclaw/workspace-ops/memory
+
+# CFO
+mkdir -p ~/.openclaw/workspace-cfo/{memory,reports,records}
+
+# Support
+mkdir -p ~/.openclaw/workspace-support/{memory,operations,authorizations}
+
+# Research (spawn-only)
+mkdir -p ~/.openclaw/workspace-research/memory
+
+# KO (spawn-only)
+mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge,memory}
 ```
 
 ---
@@ -228,8 +290,9 @@ openclaw status
 ```
 
 验证建议：
-1) 在 #cto 发消息 → CTO 应答
-2) 让 CTO 在 #build 新开 thread 派给 Builder（两步 A2A）→ Builder 在 thread 内回复
+1) 在 #ceo 发消息 → CEO 应答
+2) 让 CEO 派单给 CTO → #cto 出现 thread，CTO 在 thread 内回复
+3) 在 #cto 让 CTO 派单给 Builder → #build 出现 thread，Builder 在 thread 内回复
 
 ---
 
@@ -248,5 +311,26 @@ openclaw gateway restart
   - `bindings` 新增条目
   - `channels.slack.channels` 的 allowlist 条目
   - `tools.agentToAgent` / `session.agentToAgent` 的增量
-- （可选）删除新建目录：`~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}`
+- （可选）删除新建目录：`~/.openclaw/workspace-{ceo,pm,cto,builder,infra,perf,qa,ops,cfo,support,research,ko}`
 
+---
+
+## 组织架构参考
+
+```
+董事层
+├── 用户（人类）- 最终决策者
+└── CEO - 执行董事
+
+执行团队
+├── 产品团队 → PM
+├── 研发团队 → CTO / Builder / Infra / Perf
+├── 测试团队 → QA
+├── 运营团队 → Ops
+├── 财务团队 → CFO
+└── 售后团队 → Support
+
+Spawn-only 角色
+├── Research (调研员)
+└── KO (知识官，知识沉淀)
+```

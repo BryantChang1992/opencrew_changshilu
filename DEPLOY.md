@@ -21,15 +21,48 @@
 
 ## 1. 创建 Slack 频道（岗位）
 
-建议先创建这 8 个频道（名字可自定义）：
-- #hq（CoS 幕僚长）
+### 组织架构
+
+```
+董事层
+├── 用户（人类）- 最终决策者
+└── CEO - 执行董事，对齐用户意图、协调各团队
+
+执行团队
+├── 产品团队 → PM (产品负责人)
+├── 研发团队 → CTO (技术负责人)
+│   ├── Builder (代码实现)
+│   ├── Infra (基础设施)
+│   └── Perf (性能优化)
+├── 测试团队 → QA (测试负责人)
+├── 运营团队 → Ops (运营负责人)
+├── 财务团队 → CFO (财务负责人)
+└── OpenClaw 售后 → Support (高权限操作)
+
+Spawn-only 角色（按需调用）
+├── Research (调研员)
+└── KO (知识官，知识沉淀)
+```
+
+### 建议创建的频道
+
+**董事层**：
+- #ceo（CEO 执行董事）
+
+**执行团队**：
+- #pm（产品负责人）
 - #cto（CTO 技术负责人）
 - #build（Builder 代码实现者）
-- #infra（Infra 分布式系统与大数据专家，精通分布式存储、文件系统、共识协议）
+- #infra（Infra 基础设施专家，精通分布式存储、文件系统、共识协议）
 - #perf（Perf 性能评估专家）
-- #know（KO 知识官）
-- #ops（Ops 运维治理）
-- #research（Research 调研员，可选，通常只 spawn）
+- #qa（QA 测试负责人）
+- #ops（Ops 运营负责人）
+- #cfo（CFO 财务负责人）
+- #support（Support OpenClaw售后，负责高权限操作）
+
+**可选（spawn-only，可以不创建频道）**：
+- #research（Research 调研员）
+- #ko（KO 知识官）
 
 然后把 bot 邀请进这些频道：`/invite @<bot>`。
 
@@ -51,14 +84,14 @@ Step 2: 复制文件（见下方"方式 B"的 bash 命令，照搬即可）
   - shared/*.md → ~/.openclaw/shared/
   - workspaces/<agent>/ → ~/.openclaw/workspace-<agent>/（不覆盖已有文件）
   - 为每个 workspace 创建软链接：shared → ~/.openclaw/shared
-  - 创建子目录：memory/, ko/inbox, ko/knowledge, cto/scars, cto/patterns
+  - 创建子目录：memory/, cto/scars, cto/patterns 等
 
 Step 3: 获取 Slack Channel ID
   用户已提供 Bot Token。用 Slack API 自动获取（不需要让用户手动复制）：
   curl -s -H "Authorization: Bearer <botToken>" \
     "https://slack.com/api/conversations.list?types=public_channel&limit=200"
   从返回的 channels 里匹配 is_member=true 的频道名，拿到 Channel ID。
-  用户告诉你"#hq → CoS"时，找到 name=hq 的频道即可。
+  用户告诉你"#ceo → CEO"时，找到 name=ceo 的频道即可。
 
 Step 4: 写入 Slack 配置
   把 botToken 和 appToken 写入 channels.slack（Socket Mode）。
@@ -103,9 +136,14 @@ Slack tokens（请写入配置，不要回显）：
 - App Token: <你的 xapp- token>
 
 我已创建以下频道并邀请了 bot：
-- #hq → CoS
+- #ceo → CEO
+- #pm → PM
 - #cto → CTO
 - #build → Builder
+- #qa → QA
+- #ops → Ops
+- #cfo → CFO
+- #support → Support
 
 请读仓库里的 DEPLOY.md，按流程完成部署。
 不要改我的 models / auth / gateway 配置，只做 OpenCrew 的增量。
@@ -119,30 +157,59 @@ Slack tokens（请写入配置，不要回显）：
 mkdir -p ~/.openclaw/shared
 cp shared/*.md ~/.openclaw/shared/
 
-for a in cos cto builder infra perf ko ops research; do
+# 复制所有 workspace
+for a in ceo pm cto builder infra perf qa ops cfo support research ko; do
   mkdir -p ~/.openclaw/workspace-$a
-  # 推荐递归复制（包含 ko/knowledge、cto/scars 等子目录模板）
   rsync -a --ignore-existing "workspaces/$a/" "$HOME/.openclaw/workspace-$a/"
 done
 
-# （推荐）把 shared/ 以软链接方式挂到每个 workspace 下，让 shared 规则更容易被 Agent“看见”。
-# - 不会复制多份文件，避免 shared 漂移
-# - 如果你的 workspace 下已经有 shared/ 目录，则跳过（你可以手动处理）
-for a in cos cto builder infra perf ko ops research; do
+# （推荐）把 shared/ 以软链接方式挂到每个 workspace 下
+for a in ceo pm cto builder infra perf qa ops cfo support research ko; do
   if [ ! -e "$HOME/.openclaw/workspace-$a/shared" ]; then
     ln -s "$HOME/.openclaw/shared" "$HOME/.openclaw/workspace-$a/shared"
   fi
 done
 
-# 推荐：创建 OpenCrew 会用到的工作区子目录（避免后续写文件失败）
-mkdir -p ~/.openclaw/workspace-{cos,cto,builder,infra,perf,ko,ops,research}/memory
-mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge}
-mkdir -p ~/.openclaw/workspace-cto/{scars,patterns}
-mkdir -p ~/.openclaw/workspace-infra/{principles,decisions,benchmarks,watchlist,signals}
-mkdir -p ~/.openclaw/workspace-perf/{principles,decisions,benchmarks,reports}
+# 创建各团队需要的子目录
+# CEO
+mkdir -p ~/.openclaw/workspace-ceo/{memory,board}
+
+# PM
+mkdir -p ~/.openclaw/workspace-pm/memory
+
+# CTO
+mkdir -p ~/.openclaw/workspace-cto/{memory,scars,patterns}
+
+# Builder
+mkdir -p ~/.openclaw/workspace-builder/memory
+
+# Infra
+mkdir -p ~/.openclaw/workspace-infra/{memory,principles,decisions,benchmarks,watchlist,signals}
+
+# Perf
+mkdir -p ~/.openclaw/workspace-perf/{memory,principles,decisions,benchmarks,reports}
+
+# QA
+mkdir -p ~/.openclaw/workspace-qa/{memory,test-cases,reports}
+
+# Ops
+mkdir -p ~/.openclaw/workspace-ops/memory
+
+# CFO
+mkdir -p ~/.openclaw/workspace-cfo/{memory,reports,records}
+
+# Support
+mkdir -p ~/.openclaw/workspace-support/{memory,operations,authorizations}
+
+# Research (spawn-only)
+mkdir -p ~/.openclaw/workspace-research/memory
+
+# KO (spawn-only)
+mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge,memory}
 ```
 
 > 说明：这里使用 `rsync --ignore-existing` 是为了尽量避免覆盖你已经在用的 workspace 文件。
+
 ---
 
 ## 3. 写入最小增量配置（OpenClaw 2026.2.9）
@@ -166,23 +233,130 @@ openclaw status
 ```
 
 验证建议：
-1) 在 #hq 发一句话 → CoS 响应
+1) 在 #ceo 发一句话 → CEO 响应
 2) 在 #cto 发一句话 → CTO 响应
-3) 在 #cto 让 CTO 派一个实现任务给 Builder → #build 出现 thread，Builder 在 thread 内回复
+3) 在 #ceo 让 CEO 派一个研发任务给 CTO → #cto 出现 thread，CTO 在 thread 内回复
+4) 在 #cto 让 CTO 派一个实现任务给 Builder → #build 出现 thread，Builder 在 thread 内回复
 
 ---
 
-## 5. 可选项：如果你不需要 Infra / Perf / Research
+## 5. 组织架构说明
 
-- **Infra（分布式系统与大数据专家）**：可选，适合需要分布式系统、存储、基础设施架构评审的场景。如果不需要，可以不创建 #infra，也不添加对应配置。
-- **Perf（性能评估专家）**：可选，适合需要性能分析和优化指导的场景。如果不需要，可以不创建 #perf，也不添加对应配置。
-- **Research** 通常 spawn-only：可以不绑定 #research，或者只在需要时添加。
+### 5.1 董事层
 
-> 注意：本仓库的 Infra 已预配置为分布式系统与大数据专家（精通分布式存储、流存储、分布式文件系统、共识协议），CIO 已不再是投资专家。如果你需要投资专家，请参考原版 CIO 配置自行定制。
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **CEO** | #ceo | 💎 | 执行董事，对齐用户意图、战略方向、跨团队协调、最终决策 |
+
+**CEO 核心职责**：
+- 对齐用户真正要什么，必要时帮他重新定义问题
+- 资源有限时帮用户做取舍，给2-3选项+代价+推荐
+- 在用户忙时替他做"可逆推进"
+- 只呈现高信号信息，降低用户认知负荷
+
+### 5.2 执行团队
+
+#### 产品团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **PM** | #pm | 📋 | 产品负责人，需求管理、优先级排序、用户故事 |
+
+#### 研发团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **CTO** | #cto | 🛠️ | 技术负责人，架构决策、技术方向、工程质量 |
+| **Builder** | #build | 🧱 | 代码实现者，专注实现、测试、交付 |
+| **Infra** | #infra | 🔧 | 基础设施专家，分布式系统、存储、基础设施 |
+| **Perf** | #perf | ⚡ | 性能专家，性能分析、优化建议、基准测试 |
+
+#### 测试团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **QA** | #qa | ✅ | 测试负责人，测试策略、质量标准、缺陷跟踪 |
+
+#### 运营团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **Ops** | #ops | 📊 | 运营负责人，流程优化、成本控制、系统治理 |
+
+#### 财务团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **CFO** | #cfo | 💰 | 财务负责人，Token 成本统计、收入统计、财务报告 |
+
+#### OpenClaw 售后团队
+
+| 角色 | 频道 | Emoji | 职责 |
+|------|------|-------|------|
+| **Support** | #support | 🔧 | 高权限操作执行、系统维护、紧急响应 |
+
+**Support 高权限操作清单**：
+
+| 操作类型 | 风险等级 | 审批要求 |
+|---------|---------|---------|
+| 重启网关 | 高 | CEO 或用户批准 |
+| 数据备份 | 中 | CTO 批准 |
+| 数据恢复 | 极高 | CEO + 用户双重批准 |
+| 配置变更 | 高 | CTO 批准 |
+| 紧急停服 | 极高 | CEO 批准 |
+| 日志导出 | 低 | 自动记录 |
+
+### 5.3 Spawn-only 角色
+
+以下角色不绑定固定频道，由各团队负责人按需 spawn 调用：
+
+| 角色 | Emoji | 职责 | 可 spawn 的团队负责人 |
+|------|-------|------|----------------------|
+| **Research** | 🔍 | 技术调研、信息收集 | CEO / CTO / Infra / Perf / PM |
+| **KO** | 📚 | 知识沉淀、经验抽象、文档管理 | CEO / CTO / Infra / Perf / Ops / CFO |
+
+**KO 使用场景**：
+- CTO 完成项目后，spawn KO 整理技术文档
+- Infra 解决架构问题后，spawn KO 沉淀经验
+- CFO 生成财务报告后，spawn KO 归档记录
+
+### 5.4 A2A 权限矩阵
+
+```
+CEO      → 可派单给 PM/CTO/QA/Ops/CFO/Support
+PM       → 可派单给 CTO/QA
+CTO      → 可派单给 Builder/Infra/Perf/Support
+Infra    → 可 spawn research/ko
+Perf     → 可 spawn research/ko
+Builder  → 只接单执行，需要澄清时回到 CTO thread 提问
+QA       → 只接单执行
+Ops      → 作为审计/沉淀，通常不主动派单；可 spawn ko
+CFO      → 可 spawn ko（财务知识沉淀）
+Support  → 只接收派单，不主动派单
+```
+
+### 5.5 任务分级
+
+| 类型 | 说明 | 处理流程 | Closeout |
+|------|------|---------|----------|
+| **Q** | 一次性查询 | 直接回答 | 不需要 |
+| **A** | 小任务 | 执行层处理 | 必须 |
+| **P** | 项目/长任务 | 需 Task Card + Checkpoint | 必须 |
+| **S** | 系统变更 | 需 CEO 审批 + Ops Review | 必须 |
 
 ---
 
-## 重要说明：关于“一键脚本”和 Slack routing patch
+## 6. 可选项：如果你不需要某些团队
 
-- 本 repo **不提供/不推荐**“一键脚本直接改你的系统配置”（每个人安装路径/现有配置不同，风险大）。推荐用你现有的 OpenClaw 按步骤做可回滚的增量部署。
-- Slack 的“每条 root message 自动独立 session”目前没有纯配置级别的完美解法；高级用户可参考 `patches/`（见 docs/KNOWN_ISSUES.md）。
+- **Infra（基础设施专家）**：可选，适合需要分布式系统、存储、基础设施架构评审的场景
+- **Perf（性能专家）**：可选，适合需要性能分析和优化指导的场景
+- **QA（测试团队）**：可选，适合需要专门测试流程的项目
+- **CFO（财务团队）**：可选，适合需要成本追踪和财务报告的场景
+- **Research / KO**：spawn-only，不需要创建频道
+
+---
+
+## 重要说明：关于"一键脚本"和 Slack routing patch
+
+- 本 repo **不提供/不推荐**"一键脚本直接改你的系统配置"（每个人安装路径/现有配置不同，风险大）。推荐用你现有的 OpenClaw 按步骤做可回滚的增量部署。
+- Slack 的"每条 root message 自动独立 session"目前没有纯配置级别的完美解法；高级用户可参考 `patches/`（见 docs/KNOWN_ISSUES.md）。

@@ -1,6 +1,6 @@
-# TASKS — KO Task Ledger
+# TASKS — CEO Task Ledger
 
-> 知识沉淀任务条目
+> 所有"主线/卡点/等待用户决策"的条目
 
 | id | type | objective | owner | status | next_action | signal |
 |----|------|-----------|-------|--------|-------------|--------|

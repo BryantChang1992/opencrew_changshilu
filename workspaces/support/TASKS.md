@@ -1,6 +1,6 @@
-# TASKS — KO Task Ledger
+# TASKS — Support Task Ledger
 
-> 知识沉淀任务条目
+> 所有操作任务条目
 
 | id | type | objective | owner | status | next_action | signal |
 |----|------|-----------|-------|--------|-------------|--------|

@@ -16,12 +16,22 @@
 
 ## 1) 权限矩阵（必须遵守）
 
-- CoS → 只能给 CTO 派单/对齐方向（默认不直达 Builder）
-- CTO → 可以派单给 Builder / Research / KO / Ops / Infra / Perf
-- **Infra** → 独立运作（分布式存储专家）；可以与 CTO/Builder 同步；可 spawn research/ko
-- **Perf** → 独立运作（性能评估专家）；可以与 CTO/Builder 协作；可 spawn research/ko
-- Builder → 只接单执行；需要澄清时回到 CTO/Infra/Perf thread 提问
-- KO/Ops → 作为审计/沉淀，通常不主动派单
+```
+CEO      → 可派单给 PM/CTO/QA/Ops/CFO/Support
+PM       → 可派单给 CTO/QA
+CTO      → 可派单给 Builder/Infra/Perf/Support
+Infra    → 可 spawn research/ko
+Perf     → 可 spawn research/ko
+Builder  → 只接单执行；需要澄清时回到 CTO thread 提问
+QA       → 只接单执行
+Ops      → 作为审计/沉淀，通常不主动派单；可 spawn ko
+CFO      → 可 spawn ko（财务知识沉淀）
+Support  → 只接收派单，不主动派单
+
+Spawn-only 角色：
+Research → 被 CEO/CTO/Infra/Perf/PM spawn 调用
+KO       → 被 CEO/CTO/Infra/Perf/Ops/CFO spawn 调用
+```
 
 （注：技术上 Slack bot 可以给任意频道发消息，但这是组织纪律，不遵守视为 bug。）
 
@@ -33,7 +43,7 @@
 
 > ⚠️ 重要现实：Slack 中所有 Agent 共用同一个 bot 身份。
 > **bot 自己发到别的频道的消息，默认不会触发对方 Agent 自动运行**（OpenClaw 默认忽略 bot-authored inbound，避免自循环）。
-> 因此：跨 Agent 的“真正触发”必须通过 **sessions_send（agent-to-agent）** 完成；Slack 发消息仅作为“可见性锚点”。
+> 因此：跨 Agent 的"真正触发"必须通过 **sessions_send（agent-to-agent）** 完成；Slack 发消息仅作为"可见性锚点"。
 
 ### Step 1 — 在目标频道创建可见的 root message（锚点）
 A 在 B 的 Slack 频道创建一个任务根消息（root message），第一行固定前缀：
@@ -72,25 +82,34 @@ A 读取 root message 的 Slack message id（ts），拼出 thread sessionKey：
 - 关键 checkpoint（开始/阻塞/完成）至少更新 1 次。
 - **上游负责到底**：谁派单（例如 CTO 派给 Builder），谁负责在自己的协调 thread 里持续跟进：
   - Builder thread 的输出由 CTO 通过 sessions_send 的 tool result 捕获
-  - CTO 必须在 #cto 的对应协调 thread 里同步 checkpoint（避免 用户 去多个频道“捞信息”）
+  - CTO 必须在 #cto 的对应协调 thread 里同步 checkpoint（避免 用户 去多个频道"捞信息"）
+- **定期汇报**：A 每 15 分钟在自己的协调 thread 里汇报任务进展（详见 `SYSTEM_RULES.md` 第 10 节）
 - 完成后必须 closeout：
   - 结果摘要
   - 产出链接
   - 风险/遗留
-  - 是否需要 KO 写入知识（默认：同步到 #know + 触发 KO ingest）
+  - 是否需要 KO 写入知识（默认：spawn KO 处理）
 
 ---
 
 ## 4) 频道映射（约定）
 
-- #hq → CoS
-- #cto → CTO
-- #build → Builder
-- #invest → CIO
-- #know → KO
-- #ops → Ops
-- #research → Research
-- #main（可选：你的主入口频道） → Main Agent（可选）（不属于本系统，但可作为 用户 的总入口）
+| 频道 | Agent | 团队 |
+|------|-------|------|
+| #ceo | CEO | 董事层 |
+| #pm | PM | 产品团队 |
+| #cto | CTO | 研发团队 |
+| #build | Builder | 研发团队 |
+| #infra | Infra | 研发团队 |
+| #perf | Perf | 研发团队 |
+| #qa | QA | 测试团队 |
+| #ops | Ops | 运营团队 |
+| #cfo | CFO | 财务团队 |
+| #support | Support | 售后团队 |
+
+**Spawn-only 角色（不绑定频道）**：
+- Research：被 CEO/CTO/Infra/Perf/PM spawn 调用
+- KO：被 CEO/CTO/Infra/Perf/Ops/CFO spawn 调用
 
 ---
 
@@ -104,5 +123,37 @@ A 读取 root message 的 Slack message id（ts），拼出 thread sessionKey：
 ## 6) 失败回退
 
 如果 Slack thread 行为异常：
-- 退回到“单频道单任务”：临时在频道主线完成该任务
-- 或让 CTO/CoS 在 thread 里发 /new 重置（开始新 session id）
+- 退回到"单频道单任务"：临时在频道主线完成该任务
+- 或让 CEO/CTO 在 thread 里发 /new 重置（开始新 session id）
+
+---
+
+## 7) Spawn-only 角色使用
+
+Research 和 KO 是 spawn-only 角色，不绑定固定频道，由各团队负责人按需调用：
+
+| 角色 | 可 spawn 的团队负责人 | 用途 |
+|------|----------------------|------|
+| Research | CEO / CTO / Infra / Perf / PM | 技术调研、信息收集 |
+| KO | CEO / CTO / Infra / Perf / Ops / CFO | 知识沉淀、经验抽象 |
+
+使用方式：
+1. 用 `~/.openclaw/shared/SUBAGENT_PACKET_TEMPLATE.md` 组装任务包
+2. `sessions_spawn` 到 research/ko
+3. subagent 没有 SOUL/USER/MEMORY，任务描述必须完整自包含
+4. 要求 announce 带：Status/Result/Notes
+
+## 8) Support 团队特殊规则
+
+Support 执行高权限操作前必须验证审批：
+
+| 操作类型 | 风险等级 | 审批要求 |
+|---------|---------|---------|
+| 重启网关 | 高 | CEO 或用户批准 |
+| 数据备份 | 中 | CTO 批准 |
+| 数据恢复 | 极高 | CEO + 用户双重批准 |
+| 配置变更 | 高 | CTO 批准 |
+| 紧急停服 | 极高 | CEO 批准 |
+| 日志导出 | 低 | 自动记录 |
+
+派单给 Support 时，派单者必须明确表示已审批，否则 Support 有权拒绝执行。
