@@ -1,0 +1,138 @@
+{
+  "id": "memory-router",
+  "kind": "memory",
+  "name": "Memory Router",
+  "description": "智能记忆检索插件 - 模糊匹配优先，自适应阈值调整",
+  "uiHints": {
+    "memoryFilePath": {
+      "label": "记忆存储路径",
+      "placeholder": "~/.openclaw/memory-router/memories.json",
+      "help": "记忆文件的存储位置，支持 ~ 作为用户目录",
+      "advanced": true
+    },
+    "adaptiveMode": {
+      "label": "自适应模式",
+      "help": "根据历史匹配成功率自动调整阈值"
+    },
+    "thresholds.exact": {
+      "label": "精确匹配阈值",
+      "placeholder": "0.95",
+      "help": "精确匹配的最低分数 (0-1)",
+      "advanced": true
+    },
+    "thresholds.fuzzy": {
+      "label": "模糊匹配阈值",
+      "placeholder": "0.70",
+      "help": "模糊匹配的最低分数 (0-1)",
+      "advanced": true
+    },
+    "thresholds.semantic": {
+      "label": "语义检索阈值",
+      "placeholder": "0.60",
+      "help": "语义检索的最低分数 (0-1)",
+      "advanced": true
+    },
+    "maxMemoriesPerQuery": {
+      "label": "每次查询最大记忆数",
+      "placeholder": "3",
+      "help": "每次查询最多返回的记忆数量",
+      "advanced": true
+    },
+    "enableCache": {
+      "label": "启用缓存",
+      "help": "启用查询结果缓存以提高性能"
+    },
+    "cacheTTL": {
+      "label": "缓存有效期",
+      "placeholder": "60000",
+      "help": "缓存有效期（毫秒）",
+      "advanced": true
+    },
+    "modelSelection.highConfidence": {
+      "label": "高置信度模型",
+      "placeholder": "",
+      "help": "高置信度匹配时使用的模型（如 gpt-4o-mini），留空使用默认",
+      "advanced": true
+    },
+    "modelSelection.mediumConfidence": {
+      "label": "中置信度模型",
+      "placeholder": "",
+      "help": "中等置信度匹配时使用的模型",
+      "advanced": true
+    },
+    "modelSelection.lowConfidence": {
+      "label": "低置信度模型",
+      "placeholder": "",
+      "help": "低置信度或无匹配时使用的模型",
+      "advanced": true
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "memoryFilePath": {
+        "type": "string",
+        "default": "~/.openclaw/memory-router/memories.json"
+      },
+      "adaptiveMode": {
+        "type": "boolean",
+        "default": true
+      },
+      "thresholds": {
+        "type": "object",
+        "properties": {
+          "exact": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.95
+          },
+          "fuzzy": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.70
+          },
+          "semantic": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.60
+          }
+        }
+      },
+      "maxMemoriesPerQuery": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 10,
+        "default": 3
+      },
+      "enableCache": {
+        "type": "boolean",
+        "default": true
+      },
+      "cacheTTL": {
+        "type": "number",
+        "default": 60000
+      },
+      "modelSelection": {
+        "type": "object",
+        "properties": {
+          "highConfidence": {
+            "type": "string",
+            "default": ""
+          },
+          "mediumConfidence": {
+            "type": "string",
+            "default": ""
+          },
+          "lowConfidence": {
+            "type": "string",
+            "default": ""
+          }
+        }
+      }
+    }
+  }
+}

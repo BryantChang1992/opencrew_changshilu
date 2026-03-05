@@ -45,19 +45,42 @@
 
 ## 架构一览
 
-> 核心理解：**频道 = 岗位，Thread = 任务，#hq = Slack hq（headquarters）频道 **
+> 核心理解：**频道 = 岗位，Thread = 任务，采用公司制组织架构**
 
 ![OpenCrew Architecture](docs/OpenCrew-Architecture-with-slack.png)
 
-OpenCrew 分为三层，每层职责清晰：
+OpenCrew 采用**公司制组织架构**，分为董事层、执行团队和 Spawn-only 角色：
 
-| 层级 | 角色 | 职责 |
-|------|------|------|
-| **意图对齐** | 你 + CoS（幕僚长） | 定方向、验收结果。CoS 帮你对齐深层目标，你不在时代为推进。**CoS 不是网关，你想跟谁聊直接进哪个频道。** |
-| **执行** | CTO / Builder / Infra / Perf / Research | CTO 拆解架构，Builder 实现，Infra 是分布式系统与大数据专家（尤其精通分布式存储、分布式文件系统、共识协议），Perf 是性能评估专家，Research 按需调研。 |
-| **系统维护** | KO + Ops | KO 从产出中提炼可复用知识；Ops 审计变更、防止漂移。不做业务，只维护系统健康。 |
+### 组织架构
 
-> 最小可用：CoS + CTO + Builder（3 个 Agent 就能跑起来）。KO/Ops/Infra/Perf/Research 按需添加。
+```
+董事层
+├── 用户（人类）- 最终决策者
+└── CEO - 执行董事，对齐用户意图、协调各团队
+
+执行团队
+├── 产品团队 → PM (产品负责人)
+├── 研发团队 → CTO (技术负责人)
+│   ├── Builder (代码实现)
+│   ├── Infra (基础设施)
+│   └── Perf (性能优化)
+├── 测试团队 → QA (测试负责人)
+├── 运营团队 → Ops (运营负责人)
+├── 财务团队 → CFO (财务负责人)
+└── OpenClaw 售后 → Support (高权限操作)
+
+Spawn-only 角色（按需调用）
+├── Research (调研员)
+└── KO (知识官，知识沉淀)
+```
+
+### 协作原则
+
+- **简单、坦诚、阳光、真实**：沟通极简，结论先行，不造假，不怕出问题
+- **派单跟进**：A 给 B 派单，A 每 15 分钟汇报进展，禁止派完单看不到进展
+- **自主等级**：L0-L3 四级自主机制，明确什么该自己做、什么必须确认
+
+> 最小可用：CEO + PM + CTO + Builder（4 个 Agent 就能跑起来）。其他角色按需添加。
 
 ### 实际运行效果
 
@@ -82,16 +105,29 @@ OpenCrew 分为三层，每层职责清晰：
 
 在你的 Slack 工作区创建频道，然后在每个频道里 `/invite @你的bot名`：
 
+**董事层**：
 | 频道 | Agent | 说明 |
 |------|-------|------|
-| `#hq` | CoS 幕僚长 | 你的主要对话窗口 |
-| `#cto` | CTO 技术合伙人 | 技术方向和任务拆解 |
-| `#build` | Builder 执行者 | 具体实现和交付 |
+| `#ceo` | CEO 首席执行官 | 对齐用户意图、协调各团队、最终决策 |
 
-| `#infra` | Infra 分布式系统专家 | 分布式系统与大数据架构，精通分布式存储、文件系统、共识协议 |
+**执行团队**：
+| 频道 | Agent | 说明 |
+|------|-------|------|
+| `#pm` | PM 产品负责人 | 产品规划、需求分析、用户故事 |
+| `#cto` | CTO 技术负责人 | 技术架构、任务拆解、技术决策 |
+| `#build` | Builder 代码实现者 | 具体实现、代码交付 |
+| `#infra` | Infra 基础设施专家 | 分布式系统、存储、文件系统、共识协议 |
 | `#perf` | Perf 性能专家 | 性能诊断、压测、容量规划 |
+| `#qa` | QA 测试负责人 | 测试策略、质量保证 |
+| `#ops` | Ops 运营负责人 | 运维、监控、系统健康 |
+| `#cfo` | CFO 财务负责人 | 成本追踪、财务报告 |
+| `#support` | Support OpenClaw售后 | 高权限操作、网关重启、备份 |
 
-> 按需扩展：`#know`（KO）`#ops`（Ops）`#research`（Research）
+**Spawn-only（可选，可不创建频道）**：
+- `Research` - 调研员（按需调用）
+- `KO` - 知识官（知识沉淀）
+
+> 最小配置：#ceo + #pm + #cto + #build（4 个频道）
 
 ### Step 2：让你的 OpenClaw 完成部署
 
@@ -108,7 +144,8 @@ Slack tokens（请写入配置，不要回显）：
 - App Token: <你的 xapp- token>
 
 我已创建以下频道并邀请了 bot：
-- #hq → CoS
+- #ceo → CEO
+- #pm → PM
 - #cto → CTO
 - #build → Builder
 
@@ -124,9 +161,11 @@ Slack tokens（请写入配置，不要回显）：
 
 在 Slack 里测试：
 
-1. 在 `#hq` 发一句话 → CoS 回复 ✅
-2. 在 `#cto` 发一句话 → CTO 回复 ✅
-3. 在 `#cto` 让 CTO 派个任务给 Builder → `#build` 出现 thread，Builder 回复 ✅
+1. 在 `#ceo` 发一句话 → CEO 回复 ✅
+2. 在 `#pm` 发一句话 → PM 回复 ✅
+3. 在 `#cto` 发一句话 → CTO 回复 ✅
+4. 在 `#ceo` 让 CEO 派个任务给 CTO → `#cto` 出现 thread，CTO 回复 ✅
+5. 在 `#cto` 让 CTO 派个任务给 Builder → `#build` 出现 thread，Builder 回复 ✅
 
 > 详细的分步指南（含常见报错、排查清单）→ [完整上手指南](docs/GETTING_STARTED.md)
 
@@ -190,24 +229,34 @@ Layer 2: KO 提炼的抽象知识（原则 / 模式 / 踩坑记录）
 | **shared/** 目录下所有文件 | 全局协议和模板（Agent 的"员工手册"） | 所有 Agent |
 | 各 workspace 的 SOUL.md / AGENTS.md | 角色定义和工作流 | 对应 Agent |
 
+### 插件与扩展
+
+| 文档 | 内容 | 什么时候用 |
+|------|------|-----------|
+| **[Memory Router 部署指南](docs/MEMORY_ROUTER_SETUP.md)** | 智能记忆检索插件的部署和配置 | 需要自学习机制时 |
+| **extensions/memory-router/** | Memory Router 插件源代码 | 自定义插件行为时 |
+
 ---
 
 ## 已稳定 vs 探索中
 
 ### ✅ 已稳定运行
 
+- 公司制组织架构（董事层 + 执行团队 + Spawn-only 角色）
 - 多 Agent 领域分工 + Slack 频道绑定
 - A2A 两步触发（Slack 可见锚点 + sessions_send）
 - Closeout / Checkpoint 强制结构化产物
 - Autonomy Ladder（L0-L3）
+- 派单跟进原则（15分钟汇报机制）
 - Ops Review 治理闭环
 - Signal 评分 + KO 知识沉淀
+- Memory Router 智能记忆检索插件
 
 ### 🔄 探索中
 
-- 更好的知识系统（跨 session 语义检索）
-- 更轻量的架构（v2-lite：8 Agent → 5，9 个 shared 文件 → 3）
+- 更轻量的架构（v2-lite：减少 Agent 数量和 shared 文件）
 - Slack root message 独立 session 的更稳定方案
+- 更多平台适配（Discord / Telegram / 飞书）
 
 ---
 
@@ -270,12 +319,27 @@ opencrew/
 ├── LICENSE                           ← MIT
 ├── shared/                           ← 全局协议和模板（所有 Agent 共享）
 ├── workspaces/                       ← 每个 Agent 的工作空间
+│   ├── ceo/                          ← CEO 首席执行官
+│   ├── pm/                           ← PM 产品负责人
+│   ├── cto/                          ← CTO 技术负责人
+│   ├── build/                        ← Builder 代码实现者
+│   ├── infra/                        ← Infra 基础设施专家
+│   ├── perf/                         ← Perf 性能专家
+│   ├── qa/                           ← QA 测试负责人
+│   ├── ops/                          ← Ops 运营负责人
+│   ├── cfo/                          ← CFO 财务负责人
+│   ├── support/                      ← Support OpenClaw售后
+│   ├── research/                     ← Research 调研员（spawn-only）
+│   └── ko/                           ← KO 知识官（spawn-only）
+├── extensions/                       ← OpenClaw 插件
+│   └── memory-router/                ← Memory Router 智能记忆检索插件
 ├── docs/
 │   ├── GETTING_STARTED.md            ← 完整上手指南
 │   ├── CONCEPTS.md                   ← 核心概念详解
 │   ├── ARCHITECTURE.md               ← 架构设计
 │   ├── CUSTOMIZATION.md              ← 自定义指南
 │   ├── AGENT_ONBOARDING.md           ← Agent 入职指南（给 Agent 读的）
+│   ├── MEMORY_ROUTER_SETUP.md        ← Memory Router 插件部署指南
 │   ├── FAQ.md                        ← 常见问题
 │   ├── KNOWN_ISSUES.md               ← 已知问题
 │   ├── JOURNEY.md                    ← 开发历程

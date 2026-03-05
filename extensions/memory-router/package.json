@@ -1,0 +1,21 @@
+{
+  "name": "memory-router",
+  "version": "1.0.0",
+  "description": "OpenClaw Memory Router Plugin - 智能记忆检索，模糊匹配优先",
+  "type": "module",
+  "main": "index.ts",
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "memory",
+    "router"
+  ],
+  "peerDependencies": {
+    "openclaw": ">=1.0.0",
+    "@sinclair/typebox": "^0.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
