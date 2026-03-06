@@ -221,8 +221,11 @@ REPORT CTO→CEO | 项目X进展汇报 | 进展汇报
 
 ### 插件回滚
 
-```bash
-# 1. 在 openclaw.json 中禁用插件
+**方法 1：禁用插件**
+
+在 `openclaw.json` 中将插件设为禁用：
+
+```json
 {
   "plugins": {
     "task-followup": {
@@ -230,14 +233,22 @@ REPORT CTO→CEO | 项目X进展汇报 | 进展汇报
     }
   }
 }
+```
 
-# 2. 或从 Agent 的 plugins 数组中移除
+**方法 2：从 Agent 中移除**
+
+从 Agent 的 `plugins` 数组中移除插件名：
+
+```json
 {
   "id": "ceo",
-  "plugins": []  // 移除 "task-followup"
+  "plugins": []
 }
+```
 
-# 3. 重启
+然后重启：
+
+```bash
 openclaw gateway restart
 ```
 

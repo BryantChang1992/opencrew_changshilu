@@ -42,9 +42,8 @@ cp extensions/memory-router/package.json ~/.openclaw/extensions/memory-router/
 
 ```json
 {
-  "plugins": [
-    {
-      "id": "memory-router",
+  "plugins": {
+    "memory-router": {
       "enabled": true,
       "config": {
         "memoryFilePath": "~/.openclaw/memory-router/memories.json",
@@ -59,7 +58,7 @@ cp extensions/memory-router/package.json ~/.openclaw/extensions/memory-router/
         "cacheTTL": 60000
       }
     }
-  ]
+  }
 }
 ```
 
@@ -121,26 +120,31 @@ ls -la ~/.openclaw/extensions/memory-router/
 
 #### Step 3: 修改配置
 
-编辑 `~/.openclaw/openclaw.json`，在 `plugins` 数组中添加：
+编辑 `~/.openclaw/openclaw.json`，在 `plugins` 对象中添加：
 
 ```json
 {
-  "id": "memory-router",
-  "enabled": true,
-  "config": {
-    "memoryFilePath": "~/.openclaw/memory-router/memories.json",
-    "adaptiveMode": true,
-    "thresholds": {
-      "exact": 0.95,
-      "fuzzy": 0.70,
-      "semantic": 0.60
-    },
-    "maxMemoriesPerQuery": 3,
-    "enableCache": true,
-    "cacheTTL": 60000
+  "plugins": {
+    "memory-router": {
+      "enabled": true,
+      "config": {
+        "memoryFilePath": "~/.openclaw/memory-router/memories.json",
+        "adaptiveMode": true,
+        "thresholds": {
+          "exact": 0.95,
+          "fuzzy": 0.70,
+          "semantic": 0.60
+        },
+        "maxMemoriesPerQuery": 3,
+        "enableCache": true,
+        "cacheTTL": 60000
+      }
+    }
   }
 }
 ```
+
+**注意**：如果 `plugins` 对象中已有其他插件，只需添加 `memory-router` 条目，不要覆盖已有配置。
 
 #### Step 4: 验证配置语法
 
