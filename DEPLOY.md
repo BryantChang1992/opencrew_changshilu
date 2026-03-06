@@ -6,6 +6,23 @@
 >
 > 原则：**不依赖"一键脚本"**、不提供"完整 openclaw.json"，用最小增量 + 可回滚的方式，把 OpenCrew 加进你现有的 OpenClaw。
 
+---
+
+## 🚀 选择你的部署方式
+
+| 场景 | 推荐文档 | 说明 |
+|------|----------|------|
+| **首次部署** | 本文档 | 从零开始部署完整的 OpenCrew 多 Agent 团队 |
+| **增量更新** | [增量部署指南](docs/INCREMENTAL_DEPLOY.md) | 已部署 OpenCrew，需要添加新插件或更新协议 |
+| **添加插件** | 见下方插件章节 | Memory Router、Daily Memory Synthesizer、Task Follow-up |
+| **更新协议** | [增量部署指南](docs/INCREMENTAL_DEPLOY.md) | 更新 A2A 协议、SYSTEM_RULES 等 |
+
+**快速导航**:
+- 首次部署 → 继续阅读下方 [前置要求](#0-前置要求新手请按顺序做)
+- 添加 Task Follow-up 强制汇报机制 → [第9节](#9-可选task-followup-插件强制派单汇报机制) + [增量部署指南](docs/INCREMENTAL_DEPLOY.md#13-task-followup-插件)
+- 添加每日记忆自动总结 → [第8节](#8-可选daily-memory-synthesizer-插件每日记忆自动总结) + [增量部署指南](docs/INCREMENTAL_DEPLOY.md#12-daily-memory-synthesizer-插件)
+- 启用双向沟通机制 → [增量部署指南](docs/INCREMENTAL_DEPLOY.md#21-a2a-协议更新)
+
 ## 核心原则（所有 Agent 必须遵守）
 
 ### 团队文化：简单、坦诚、阳光、真实
@@ -410,6 +427,202 @@ mkdir -p ~/.openclaw/extensions/memory-router
 cp extensions/memory-router/* ~/.openclaw/extensions/memory-router/
 
 # 然后在 openclaw.json 中启用插件（详见上述文档）
+```
+
+---
+
+## 8. 可选：Daily Memory Synthesizer 插件（每日记忆自动总结）
+
+Daily Memory Synthesizer 是一个 OpenClaw 插件，让每个 Agent 在每天结束时**自主总结当日的经验教训**，形成自我迭代机制。
+
+### 功能特性
+
+- ✅ **自动记录任务**：在任务完成时自动记录到每日记忆
+- ✅ **洞察和经验追踪**：记录今日洞察、经验教训、自我迭代
+- ✅ **每日总结生成**：生成结构化的每日记忆 Markdown 文件
+- ✅ **定时提醒机制**：在每天指定时间提醒 Agent 进行总结
+- ✅ **长期记忆升级**：支持将高价值内容升级到 MEMORY.md
+
+### 为什么需要这个插件？
+
+原架构的问题：
+- Agent 不会每天主动整理记忆
+- Daily memory 文件更新是被动触发的
+- 没有机制确保每天都有内容写入
+- 完全依赖 agent 的"自律性"
+
+这个插件解决的问题：
+- **形成习惯**：通过定时提醒让 Agent 养成每日总结的习惯
+- **结构化记录**：提供标准化的记录格式（任务、洞察、经验、迭代）
+- **自动触发**：在任务完成时自动记录，减少遗忘
+- **长期沉淀**：定期升级高价值内容到长期记忆
+
+### 部署文档
+
+详细的部署指南（包含全新部署和增量部署两种方式）请参考：
+
+📄 **`docs/DAILY_MEMORY_SYNTHESIZER_SETUP.md`**
+
+该文档包含：
+- Part A: 全新部署（与 OpenCrew 一起部署）
+- Part B: 增量部署（已有 OpenClaw 用户）
+- 使用指南和最佳实践
+- 与 Memory Router 插件协同使用
+- 故障排查指南
+
+### 快速预览
+
+```bash
+# 复制插件文件
+mkdir -p ~/.openclaw/extensions/daily-memory-synthesizer
+cp extensions/daily-memory-synthesizer/* ~/.openclaw/extensions/daily-memory-synthesizer/
+
+# 在 openclaw.json 中启用插件
+{
+  "plugins": {
+    "daily-memory-synthesizer": {
+      "enabled": true,
+      "config": {
+        "memoryDir": "memory",
+        "summaryHour": 23,
+        "enableAutoSummary": true
+      }
+    }
+  },
+  "agents": {
+    "list": [
+      {
+        "id": "ceo",
+        "plugins": ["daily-memory-synthesizer"]
+      }
+    ]
+  }
+}
+```
+
+### 与 Memory Router 协同使用
+
+建议同时部署两个插件，形成完整的记忆管理体系：
+
+- **memory-router**: 负责**检索**已有记忆，提供智能匹配
+- **daily-memory-synthesizer**: 负责**生成**每日记忆，形成自我迭代
+
+```json
+{
+  "id": "ceo",
+  "plugins": [
+    "memory-router",              // 检索已有记忆
+    "daily-memory-synthesizer"    // 生成每日记忆
+  ]
+}
+```
+
+---
+
+## 9. 可选：Task Follow-up 插件（强制派单汇报机制）
+
+Task Follow-up 是一个 OpenClaw 插件，**强制保证派单汇报机制的有效性**，解决了原架构中派单汇报依赖Agent自觉性的问题。
+
+### 功能特性
+
+- ✅ **任务注册跟踪**：派单时注册任务到跟踪系统
+- ✅ **强制定时汇报**：每15分钟（可配置）提醒Agent汇报进展
+- ✅ **超时自动升级**：超时未汇报自动升级，3次后通知CEO
+- ✅ **状态实时查询**：随时查询任务状态和统计信息
+- ✅ **双向沟通支持**：支持团队负责人主动向CEO汇报
+
+### 为什么需要这个插件？
+
+原架构的问题：
+- 派单汇报"每15分钟"只是文档约束，没有技术保障
+- 完全依赖 Agent 的主动性和记忆力
+- HEARTBEAT 间隔12小时，无法跟踪具体任务
+- 没有超时惩罚机制
+
+这个插件解决的问题：
+- **强制执行**：通过技术手段强制保证汇报机制生效
+- **自动提醒**：超时未汇报会收到警告
+- **自动升级**：多次超时自动通知CEO介入
+- **双向沟通**：团队负责人可以主动向CEO汇报
+
+### 部署文档
+
+详细的部署指南（包含全新部署和增量部署两种方式）请参考：
+
+📄 **`docs/TASK_FOLLOWUP_SETUP.md`**
+
+该文档包含：
+- Part A: 全新部署（与 OpenCrew 一起部署）
+- Part B: 增量部署（已有 OpenClaw 用户）
+- Part C: 双向沟通机制部署
+- 使用指南和最佳实践
+- 与其他插件协同使用
+- 故障排查指南
+
+### 快速预览
+
+```bash
+# 复制插件文件
+mkdir -p ~/.openclaw/extensions/task-followup
+cp extensions/task-followup/* ~/.openclaw/extensions/task-followup/
+
+# 在 openclaw.json 中启用插件
+{
+  "plugins": {
+    "task-followup": {
+      "enabled": true,
+      "config": {
+        "reportIntervalMinutes": 15,
+        "maxEscalateCount": 3,
+        "enableAutoEscalation": true
+      }
+    }
+  },
+  "agents": {
+    "list": [
+      {
+        "id": "ceo",
+        "plugins": ["task-followup"]
+      },
+      {
+        "id": "cto",
+        "plugins": ["task-followup"]
+      }
+    ]
+  }
+}
+```
+
+### 使用方式
+
+#### 派单时（CEO/CTO/PM等）
+
+1. 创建 root message 并用 sessions_send 触发目标 Agent
+2. **调用 `task_followup_register` 注册任务**
+3. **每15分钟调用 `task_followup_report` 汇报进展**
+
+#### 主动向CEO汇报（各团队负责人）
+
+在 #ceo 频道创建 thread，标题格式：
+```
+REPORT CTO→CEO | 项目X进展汇报 | 进展汇报
+```
+
+然后用 sessions_send 触发 CEO session。
+
+### 与其他插件协同
+
+建议三个插件协同使用：
+
+```json
+{
+  "id": "ceo",
+  "plugins": [
+    "memory-router",              // 检索已有记忆
+    "daily-memory-synthesizer",   // 生成每日记忆
+    "task-followup"               // 强制汇报机制
+  ]
+}
 ```
 
 ---

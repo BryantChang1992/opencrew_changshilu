@@ -280,6 +280,96 @@ mkdir -p ~/.openclaw/workspace-research/memory
 mkdir -p ~/.openclaw/workspace-ko/{inbox,knowledge,memory}
 ```
 
+### G) 可选：启用 Daily Memory Synthesizer 插件（推荐）
+
+Daily Memory Synthesizer 插件让每个 Agent 在每天结束时自主总结当日的经验教训，形成自我迭代机制。
+
+#### 全新部署
+
+在 `openclaw.json` 中添加插件全局配置：
+
+```json
+{
+  "plugins": {
+    "daily-memory-synthesizer": {
+      "enabled": true,
+      "config": {
+        "memoryDir": "memory",
+        "timezone": "Asia/Shanghai",
+        "summaryHour": 23,
+        "enableAutoSummary": true,
+        "maxTasksPerDay": 20
+      }
+    }
+  }
+}
+```
+
+然后在每个需要的 Agent 配置中添加插件：
+
+```json
+{
+  "agents": {
+    "list": [
+      {
+        "id": "ceo",
+        "name": "Chief Executive Officer",
+        "workspace": "~/.openclaw/workspace-ceo",
+        "plugins": ["daily-memory-synthesizer"],
+        "subagents": { "allowAgents": ["ceo", "research", "ko"] }
+      },
+      {
+        "id": "cto",
+        "name": "CTO / Tech Lead",
+        "workspace": "~/.openclaw/workspace-cto",
+        "plugins": ["daily-memory-synthesizer"],
+        "subagents": { "allowAgents": ["cto", "builder", "infra", "perf", "research", "ko"] }
+      },
+      {
+        "id": "pm",
+        "name": "Product Manager",
+        "workspace": "~/.openclaw/workspace-pm",
+        "plugins": ["daily-memory-synthesizer"],
+        "subagents": { "allowAgents": ["pm", "research"] }
+      },
+      {
+        "id": "ops",
+        "name": "Operations",
+        "workspace": "~/.openclaw/workspace-ops",
+        "plugins": ["daily-memory-synthesizer"],
+        "subagents": { "allowAgents": ["ops", "ko"] }
+      }
+    ]
+  }
+}
+```
+
+#### 增量部署
+
+如果你已经部署了 OpenCrew，只需：
+
+1. 添加插件全局配置（见上）
+2. 在需要的 Agent 配置中添加 `"plugins": ["daily-memory-synthesizer"]`
+3. 重启：`openclaw gateway restart`
+
+#### 与 Memory Router 协同使用
+
+建议同时启用两个插件：
+
+```json
+{
+  "id": "ceo",
+  "plugins": [
+    "memory-router",              // 检索已有记忆
+    "daily-memory-synthesizer"    // 生成每日记忆
+  ]
+}
+```
+
+#### 详细文档
+
+完整的部署和使用指南请参考：**`docs/DAILY_MEMORY_SYNTHESIZER_SETUP.md`**
+
 ---
 
 ## 应用后：重启 + 验证

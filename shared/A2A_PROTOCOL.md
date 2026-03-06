@@ -16,6 +16,8 @@
 
 ## 1) 权限矩阵（必须遵守）
 
+### 派单权限（单向）
+
 ```
 CEO      → 可派单给 PM/CTO/QA/Ops/CFO/Support
 PM       → 可派单给 CTO/QA
@@ -27,8 +29,39 @@ QA       → 只接单执行
 Ops      → 作为审计/沉淀，通常不主动派单；可 spawn ko
 CFO      → 可 spawn ko（财务知识沉淀）
 Support  → 只接收派单，不主动派单
+```
 
-Spawn-only 角色：
+### 双向沟通权限（新增）
+
+**重要变更**：所有团队负责人现在都可以主动与CEO沟通（但不能派单给CEO）。
+
+```
+PM/CTO/QA/Ops/CFO/Support → CEO
+  ✅ 允许：汇报进展、请示问题、上报风险、主动同步信息
+  ❌ 禁止：派单给CEO
+
+Builder/Infra/Perf → CEO
+  ✅ 允许：通过CTO间接汇报（先向CTO汇报，CTO决定是否上报CEO）
+  ❌ 禁止：直接联系CEO（需遵守层级管理）
+```
+
+**沟通方式**：
+1. **主动汇报**：在 #ceo 频道创建 thread，标题格式：
+   ```
+   REPORT <FROM>→CEO | <TITLE> | <TYPE>
+   ```
+   TYPE可以是：`进展汇报` / `问题请示` / `风险上报` / `信息同步`
+
+2. **紧急情况**：如果需要CEO立即关注，在标题中加 `[URGENT]`：
+   ```
+   REPORT <FROM>→CEO | [URGENT] <TITLE> | 风险上报
+   ```
+
+3. **必须使用 sessions_send**：和派单一样，需要用 sessions_send 触发CEO session
+
+### Spawn-only 角色
+
+```
 Research → 被 CEO/CTO/Infra/Perf/PM spawn 调用
 KO       → 被 CEO/CTO/Infra/Perf/Ops/CFO spawn 调用
 ```

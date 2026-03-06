@@ -1,0 +1,66 @@
+{
+  "id": "daily-memory-synthesizer",
+  "kind": "memory",
+  "name": "Daily Memory Synthesizer",
+  "description": "每日记忆自动总结插件 - 让 Agent 每天自主总结经验教训，形成自我迭代机制",
+  "uiHints": {
+    "memoryDir": {
+      "label": "Memory 目录",
+      "placeholder": "memory",
+      "help": "相对于 workspace 的 memory 目录路径",
+      "advanced": false
+    },
+    "timezone": {
+      "label": "时区",
+      "placeholder": "Asia/Shanghai",
+      "help": "时区设置，用于确定每天的起止时间",
+      "advanced": true
+    },
+    "summaryHour": {
+      "label": "每日总结时间",
+      "placeholder": "23",
+      "help": "每天几点触发总结提示（0-23），默认 23 点",
+      "advanced": false
+    },
+    "enableAutoSummary": {
+      "label": "启用自动总结提示",
+      "help": "在每天指定时间自动提示 Agent 进行每日总结"
+    },
+    "maxTasksPerDay": {
+      "label": "每日最大任务数",
+      "placeholder": "20",
+      "help": "每天最多记录多少任务，防止记忆过载",
+      "advanced": true
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "memoryDir": {
+        "type": "string",
+        "default": "memory"
+      },
+      "timezone": {
+        "type": "string",
+        "default": "Asia/Shanghai"
+      },
+      "summaryHour": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 23,
+        "default": 23
+      },
+      "enableAutoSummary": {
+        "type": "boolean",
+        "default": true
+      },
+      "maxTasksPerDay": {
+        "type": "number",
+        "minimum": 5,
+        "maximum": 50,
+        "default": 20
+      }
+    }
+  }
+}

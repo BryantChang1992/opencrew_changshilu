@@ -1,0 +1,19 @@
+{
+  "name": "task-followup",
+  "version": "1.0.0",
+  "description": "OpenClaw 插件：任务跟踪与强制汇报",
+  "main": "index.ts",
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "task",
+    "followup",
+    "tracking"
+  ],
+  "author": "OpenCrew",
+  "license": "MIT",
+  "peerDependencies": {
+    "openclaw": ">=2026.0.0",
+    "@sinclair/typebox": "^0.32.0"
+  }
+}
